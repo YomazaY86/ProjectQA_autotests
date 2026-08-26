@@ -52,3 +52,6 @@ web/LOCATORS.md
 # Frontend (Vue / Vite)
 web/node_modules/
 web/dist/
+
+venv/
+.venv/
