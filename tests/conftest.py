@@ -1,4 +1,3 @@
-import faker
 import pytest
 import requests
 from faker import Faker
@@ -19,7 +18,6 @@ def register_user(api_client, faker_gen):
     fake_name = faker_gen.first_name_male()
     fake_password = faker_gen.password(special_chars=True, length=8, digits=True)
 
-
     new_user = requests.post(
         url=f"{api_client}/v1/users/register",
         headers={"Content-Type": "application/json"},
@@ -35,6 +33,26 @@ def register_user(api_client, faker_gen):
     return {"email_sent": fake_email,
             "email_received": data["user"]["email"],
             "user_id": data["user"]["id"],
-            "access_token": data['accessToken']
+            "access_token": data['accessToken'],
+            "password": fake_password
             }
+
+@pytest.fixture()
+def login_user(api_client,register_user):
+    user_data = register_user
+
+    login = requests.post(url=f"{api_client}/v1/users/login",
+                          headers={"Content-Type": "application/json"},
+                          json={"email": user_data["email_sent"],
+                                "password": user_data["password"]})
+
+    assert login.status_code == 200, f"Логин пользователя не успешен, код ответа {login.status_code}"
+
+    print(f"Пользователь авторизован под логином {user_data["email_sent"]} и паролем {user_data["password"]}")
+
+    response_data = login.json()
+
+    return {"access_token": response_data["accessToken"],
+            "user_id": response_data["user"]["id"]}
+
 
