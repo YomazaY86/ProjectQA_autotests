@@ -7,10 +7,12 @@ from faker import Faker
 def api_client():
     return "http://localhost:8081"
 
+
 @pytest.fixture(scope="session")
 def faker_gen():
     fake = Faker("ru_RU")
     return fake
+
 
 @pytest.fixture(scope="function")
 def register_user(api_client, faker_gen):
@@ -37,6 +39,7 @@ def register_user(api_client, faker_gen):
             "password": fake_password
             }
 
+
 @pytest.fixture()
 def login_user(api_client,register_user):
     user_data = register_user
@@ -54,5 +57,25 @@ def login_user(api_client,register_user):
 
     return {"access_token": response_data["accessToken"],
             "user_id": response_data["user"]["id"]}
+
+
+@pytest.fixture()
+def get_first_product_id(api_client):
+    get_all_products = requests.get(url=f"{api_client}/v1/products")
+
+    assert get_all_products.status_code == 200, f"Ошибка получения товаров код {get_all_products.status_code}"
+
+    all_products = get_all_products.json()
+    first_product = all_products["products"][0]
+
+    return first_product["id"]
+
+
+
+
+
+
+
+
 
 
