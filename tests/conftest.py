@@ -14,7 +14,7 @@ def faker_gen():
     return fake
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def register_user(api_client, faker_gen):
     fake_email = faker_gen.email()
     fake_name = faker_gen.first_name_male()
@@ -29,12 +29,13 @@ def register_user(api_client, faker_gen):
 
     assert new_user.status_code == 200, f"Регистрация неуспешна, код ответа {new_user.status_code}"
     data = new_user.json()
+    user_id = data.get("user", {}).get("id")
 
     print(f"Создан новый пользователь с email - {fake_email}, паролем - {fake_password}, именем - {fake_name}")
 
     return {"email_sent": fake_email,
             "email_received": data["user"]["email"],
-            "user_id": data["user"]["id"],
+            "user_id": user_id,
             "access_token": data['accessToken'],
             "password": fake_password
             }
