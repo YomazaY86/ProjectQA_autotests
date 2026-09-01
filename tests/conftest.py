@@ -70,7 +70,7 @@ def get_first_product_id(api_client):
     first_product = all_products["products"][0]
 
     return first_product["id"]
-
+# 123
 
 
 
